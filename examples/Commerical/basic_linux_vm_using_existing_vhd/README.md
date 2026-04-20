@@ -18,7 +18,7 @@ provider "azurerm" {
 # Terraform module for deploying a Custom VHD-based Virtual Machine in Azure. 
 
 module "mod_virtual_machine" {
-  #source  = "azurenoops/overlays-custom-virtual-machine/azurerm"
+  #source  = "POps-Rox/overlays-custom-virtual-machine/azurerm"
   #version = "~>0.9"
   source = "../../.."
 
