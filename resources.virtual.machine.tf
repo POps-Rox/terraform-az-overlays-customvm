@@ -72,7 +72,14 @@ resource "azurerm_availability_set" "aset" {
 }
 
 #---------------------------------------
-# Custom Virutal machine
+# Custom Virtual machine
+# NOTE: Using legacy azurerm_virtual_machine resource because this module's
+# architecture relies on create_option = "Attach" to attach a pre-imported
+# managed disk from VHD. The 4.x azurerm_linux_virtual_machine and
+# azurerm_windows_virtual_machine resources do not support attaching existing
+# OS disks (only FromImage). The legacy resource is deprecated but still
+# functional in azurerm 4.x (removed in 5.x). Full migration to 4.x-native
+# resources requires architectural refactor to use captured images.
 #---------------------------------------
 resource "azurerm_virtual_machine" "custom_vm" {
   depends_on          = [azurerm_network_interface_security_group_association.nsgassoc]
