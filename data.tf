@@ -32,7 +32,9 @@ data "azurerm_storage_account" "storeacc" {
 }
 
 resource "random_password" "passwd" {
-  count       = (var.custom_boot_image.os_type == "linux" && var.disable_password_authentication == false && var.admin_password == null ? 1 : (var.custom_boot_image.os_type == "windows" && var.admin_password == null ? 1 : 0))
+  # `var.custom_boot_image` defaults to null, so guard the attribute access
+  # with `try()` to keep `tflint` happy during static analysis.
+  count       = (try(var.custom_boot_image.os_type, null) == "linux" && var.disable_password_authentication == false && var.admin_password == null ? 1 : (try(var.custom_boot_image.os_type, null) == "windows" && var.admin_password == null ? 1 : 0))
   length      = var.random_password_length
   min_upper   = 4
   min_lower   = 2
@@ -40,6 +42,6 @@ resource "random_password" "passwd" {
   special     = false
 
   keepers = {
-    admin_password = (var.custom_boot_image.os_type == "linux" ? local.linux_vm_name : (var.custom_boot_image.os_type == "windows" ? local.windows_vm_name : null))
+    admin_password = (try(var.custom_boot_image.os_type, null) == "linux" ? local.linux_vm_name : (try(var.custom_boot_image.os_type, null) == "windows" ? local.windows_vm_name : null))
   }
 }
