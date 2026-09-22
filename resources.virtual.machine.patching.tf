@@ -8,7 +8,7 @@ resource "azurerm_maintenance_assignment_virtual_machine" "maintenance_configura
   for_each                     = toset(var.maintenance_configuration_ids)
   location                     = local.location
   maintenance_configuration_id = each.value
-  virtual_machine_id           = azurerm_virtual_machine.custom_vm.*.id
+  virtual_machine_id           = azurerm_virtual_machine.custom_vm[0].id
 
   lifecycle {
     precondition {

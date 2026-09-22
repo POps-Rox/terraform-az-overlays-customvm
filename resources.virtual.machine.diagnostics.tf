@@ -5,7 +5,7 @@
 # Azure Log Analytics Workspace Agent Installation for windows
 #--------------------------------------------------------------
 resource "azurerm_virtual_machine_extension" "omsagentwin" {
-  count                      = var.deploy_log_analytics_agent && var.custom_boot_image.os_type == "windows" ? var.instances_count : 0
+  count                      = var.deploy_log_analytics_agent && local.custom_boot_image_os_type == "windows" ? var.instances_count : 0
   name                       = var.instances_count == 1 ? "OmsAgentForWindows" : format("%s%s", "OmsAgentForWindows", count.index + 1)
   virtual_machine_id         = azurerm_virtual_machine.custom_vm[count.index].id
   publisher                  = "Microsoft.EnterpriseCloud.Monitoring"
@@ -30,7 +30,7 @@ resource "azurerm_virtual_machine_extension" "omsagentwin" {
 # Azure Log Analytics Workspace Agent Installation for Linux
 #--------------------------------------------------------------
 resource "azurerm_virtual_machine_extension" "omsagentlinux" {
-  count                      = var.deploy_log_analytics_agent && var.custom_boot_image.os_type == "linux" ? var.instances_count : 0
+  count                      = var.deploy_log_analytics_agent && local.custom_boot_image_os_type == "linux" ? var.instances_count : 0
   name                       = var.instances_count == 1 ? "OmsAgentForLinux" : format("%s%s", "OmsAgentForLinux", count.index + 1)
   virtual_machine_id         = azurerm_virtual_machine.custom_vm[count.index].id
   publisher                  = "Microsoft.EnterpriseCloud.Monitoring"
