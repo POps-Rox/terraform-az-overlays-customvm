@@ -6,8 +6,14 @@
 locals {
   backup_resource_group_name = var.backup_policy_id != null ? split("/", var.backup_policy_id)[4] : null
   backup_recovery_vault_name = var.backup_policy_id != null ? split("/", var.backup_policy_id)[8] : null
-  linux_domain_name_label    = lower(coalesce(var.internal_dns_name_label, local.linux_vm_name))
-  windows_domain_name_label  = lower(coalesce(var.internal_dns_name_label, local.windows_vm_name))
+  custom_boot_image_os_type  = lower(try(var.custom_boot_image.os_type, ""))
+  custom_boot_image_os_type_title = (
+    local.custom_boot_image_os_type == "linux" ? "Linux" :
+    local.custom_boot_image_os_type == "windows" ? "Windows" :
+    try(var.custom_boot_image.os_type, null)
+  )
+  linux_domain_name_label   = lower(coalesce(var.internal_dns_name_label, local.linux_vm_name))
+  windows_domain_name_label = lower(coalesce(var.internal_dns_name_label, local.windows_vm_name))
   nsg_inbound_rules = { for idx, security_rule in var.nsg_inbound_rules : security_rule.name => {
     idx : idx,
     security_rule : security_rule,

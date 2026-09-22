@@ -9,6 +9,6 @@ resource "azurerm_backup_protected_vm" "backup" {
 
   resource_group_name = local.backup_resource_group_name
   recovery_vault_name = local.backup_recovery_vault_name
-  source_vm_id        = azurerm_virtual_machine.custom_vm.*.id
+  source_vm_id        = azurerm_virtual_machine.custom_vm[0].id
   backup_policy_id    = var.backup_policy_id
 }

@@ -84,7 +84,7 @@ resource "azurerm_availability_set" "aset" {
 resource "azurerm_virtual_machine" "custom_vm" {
   depends_on          = [azurerm_network_interface_security_group_association.nsgassoc]
   count               = var.instances_count
-  name                = var.instances_count == 1 ? substr(local.linux_vm_name, 0, 64) : substr(format("%s%s", lower(replace(local.linux_vm_name, "/[[:^alnum:]]/", "")), count.index + 1), 0, 64)
+  name                = var.instances_count == 1 ? substr(local.vm_name, 0, 64) : substr(format("%s%s", lower(replace(local.vm_name, "/[[:^alnum:]]/", "")), count.index + 1), 0, 64)
   location            = local.location
   resource_group_name = local.resource_group_name
   vm_size             = var.virtual_machine_size
@@ -93,7 +93,7 @@ resource "azurerm_virtual_machine" "custom_vm" {
 
   availability_set_id          = var.enable_vm_availability_set == true ? element(concat(azurerm_availability_set.aset.*.id, [""]), 0) : null
   proximity_placement_group_id = var.enable_proximity_placement_group ? azurerm_proximity_placement_group.appgrp.0.id : null
-  tags                         = merge({ "ResourceName" = var.instances_count == 1 ? local.linux_vm_name : format("%s%s", lower(replace(local.linux_vm_name, "/[[:^alnum:]]/", "")), count.index + 1) }, var.add_tags, )
+  tags                         = merge({ "ResourceName" = var.instances_count == 1 ? local.vm_name : format("%s%s", lower(replace(local.vm_name, "/[[:^alnum:]]/", "")), count.index + 1) }, var.add_tags, )
 
   /* os_profile {
     computer_name  = var.instances_count == 1 ? local.linux_vm_name : format("%s%s", lower(replace(local.linux_vm_name, "/[[:^alnum:]]/", "")), count.index + 1)
@@ -104,7 +104,7 @@ resource "azurerm_virtual_machine" "custom_vm" {
 
   ### OS Profile for Linux VMs with SSH
   dynamic "os_profile_linux_config" {
-    for_each = var.custom_boot_image.os_type == "Linux" && var.disable_password_authentication ? [1] : []
+    for_each = local.custom_boot_image_os_type == "linux" && var.disable_password_authentication ? [1] : []
     content {
       disable_password_authentication = var.disable_password_authentication
       ssh_keys {
@@ -116,7 +116,7 @@ resource "azurerm_virtual_machine" "custom_vm" {
 
   ### OS Profile for Linux VMs with admin password
   dynamic "os_profile_linux_config" {
-    for_each = var.custom_boot_image.os_type == "Linux" && !var.disable_password_authentication ? [1] : []
+    for_each = local.custom_boot_image_os_type == "linux" && !var.disable_password_authentication ? [1] : []
     content {
       disable_password_authentication = var.disable_password_authentication
     }
@@ -133,7 +133,7 @@ resource "azurerm_virtual_machine" "custom_vm" {
 
   storage_os_disk {
     create_option             = "Attach"
-    os_type                   = var.custom_boot_image.os_type
+    os_type                   = local.custom_boot_image_os_type_title
     caching                   = var.os_disk_caching
     disk_size_gb              = var.disk_size_gb
     write_accelerator_enabled = var.enable_os_disk_write_accelerator
